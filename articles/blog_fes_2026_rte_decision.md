@@ -32,14 +32,16 @@ publication_name: "cybozu_frontend"
 
 ```mermaid
 %%{init: {'theme': 'base', 'themeVariables': {
-  'cScale0': '#eef3f8', 'cScaleLabel0': '#333333'
-}, 'timeline': {'disableMulticolor': true}}}%%
-timeline
-    2022/12 : draft-js アーカイブ
-    2023/06 : CKEditor 4 EOL
-    2023/11 : Closure Library メンテナンスモード入り
-    2024/04 : Quill 2.0（約 4 年半の停滞から復活）
-    2024/08 : Closure Library アーカイブ
+  'primaryColor': '#eef3f8', 'primaryTextColor': '#333333',
+  'primaryBorderColor': '#b8cfe0', 'lineColor': '#b8cfe0'
+}}}%%
+flowchart TD
+    e1("2022/12　draft-js アーカイブ")
+    e2("2023/06　CKEditor 4 EOL")
+    e3("2023/11　Closure Library メンテナンスモード入り")
+    e4("2024/04　Quill 2.0（約 4 年半の停滞から復活）")
+    e5("2024/08　Closure Library アーカイブ")
+    e1 --> e2 --> e3 --> e4 --> e5
 ```
 
 draft-js は Meta 製で React 界の定番（後継は Lexical）[^1]、CKEditor 4 は 2012 年生まれの老舗[^2]、Closure Library は `goog.editor` という RTE を同梱していた Google 製ライブラリでした[^3]。定番だった Quill は、約 4 年半のあいだ更新が止まっていました[^4]。
