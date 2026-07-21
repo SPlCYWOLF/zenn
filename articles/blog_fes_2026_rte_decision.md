@@ -44,19 +44,19 @@ flowchart TD
     e1 --> e2 --> e3 --> e4 --> e5
 ```
 
-draft-js は Meta 製で React 界の定番（後継は Lexical）[^1]、CKEditor 4 は 2012 年生まれの老舗[^2]、Closure Library は `goog.editor` という RTE を同梱していた Google 製ライブラリでした[^3]。定番だった Quill は、約 4 年半のあいだ更新が止まっていました[^4]。
+draft-js は Meta 製で React 界の定番（後継は Lexical）[^1]、CKEditor 4 は 2012 年生まれの老舗[^2]、Closure Library は `goog.editor` という RTE を同梱していた Google 製ライブラリでした[^3]。定番だった Quill は、約 4 年半のあいだ更新が止まっていました。
 
 わずか 2〜3 年でこの有様です。しかも、どれも「当時最善の選定」だったはずのライブラリたちです。
 
-一方で、ユーザーがこれらエディタを使って書いた過去の文書は、**今日も開かれます**。
+一方で、ユーザーがこれらのエディタを使って書いた過去の文書は、**今日も開かれます**。
 
 つまりこういうことです。**RTE は内装、データフォーマットは基礎と配管**。内装の流行は数年で変わりますが、基礎は建て替えまで残ります。
 
 ## エディタには 2 つの世代がある
 
-なぜフォーマットがそこまで大事なのか。それを理解するために、RTE の歴史をざっくり 2 世代に分けてみます。
+なぜフォーマットがそこまで大事なのか、RTE の歴史をざっくり 2 世代に分けて見ていきます。
 
-**第 1 世代**は、ブラウザ標準の `contenteditable`（HTML 要素をその場で編集可能にする機能）と `execCommand` をラップして機能を足していく方式です。CKEditor の開発者自身が振り返っているように、かつての WYSIWYG エディタはこの 2 つの API を土台に、ツールバーを被せる形で作られていました[^5]。手軽な反面、ブラウザへの依存は強烈でした。一つ例を挙げると、Enter キーを 1 回押したときに生成される要素は、かつて Firefox では `<br>`、IE では `<p>`、Chrome/Safari では `<div>` と、**ブラウザごとにバラバラ**だったのです[^6]。土台だった `execCommand` も、現在は MDN で非推奨（deprecated）と明記されています[^7]。
+**第 1 世代**は、ブラウザ標準の `contenteditable`（HTML 要素をその場で編集可能にする機能）と `execCommand` をラップして機能を足していく方式です。CKEditor の開発者自身が振り返っているように、かつての WYSIWYG エディタはこの 2 つの API を土台に、ツールバーを被せる形で作られていました[^4]。手軽な反面、ブラウザへの依存は強烈でした。一つ例を挙げると、Enter キーを 1 回押したときに生成される要素は、かつて Firefox では `<br>`、IE では `<p>`、Chrome/Safari では `<div>` と、**ブラウザごとにバラバラ**でした[^5]。土台だった `execCommand` も、現在は MDN で非推奨（deprecated）と明記されています。
 
 この世代の重要な特徴は、**保存されるデータが「任意の HTML」になる**ことです。ブラウザが生成するなんでもありの HTML を、そのまま受け入れて保存するしかないからです。
 
@@ -88,7 +88,7 @@ RTE のデータ保存フォーマットは、大きく分けて 3 種類あり�
 詳細は[こちら](https://example.com)を**必ず**確認
 ```
 
-どれを選んでも良いですが、重要なのは、**選んだ瞬間に、将来へ課される「義務」が決まる**ことです。
+どれを選んでも良いですが、重要なのは、**選んだ瞬間に、将来に課される「義務」が決まる**ことです。
 
 | フォーマット | 得意なこと | 選んだ瞬間に発生する義務 |
 | --- | --- | --- |
@@ -96,23 +96,23 @@ RTE のデータ保存フォーマットは、大きく分けて 3 種類あり�
 | 構造化 JSON | 検証・プログラムによる変換・共同編集 | スキーマの互換性を管理し続けること。エディタ実装との癒着を防ぐこと |
 | Markdown | 可搬性・可読性・AI との相性 | 表現力の上限を受け入れること（拡張記法で上限を破ると、事実上の独自フォーマットと化す） |
 
-ちなみに、フォーマットの乗り換えは「全データを一括変換して終わり」とはいきません。変更履歴や監査ログ、外部連携先などに旧形式のデータが残り続けるため、**旧形式を読む義務だけは残り続けます**。
+ちなみに、フォーマットの乗り換えは「全データを一括変換して終わり」とはいきません。変更履歴や監査ログ、外部連携先などに旧形式のデータが残るため、**旧形式を読む義務だけは残り続けます**。
 
 ## そのフォーマット、いずれ API になります
 
 「保存フォーマットなんて DB の中の話でしょ？」と思うかもしれません。ところが、サービスが成長すれば、保存フォーマットはいずれ REST API の入出力として外部に顔を出すことになります。そして 2026 年現在、その API の無視できない新しい利用者として **AI エージェントが加わりました**。
 
-象徴的なのが Notion です。もともとブロック単位の構造化 JSON を API で提供してきた Notion は、Markdown でページを読み書きする API を追加しました。公式ガイドはこれを「Markdown をネイティブに扱うエージェント系システムや開発者ツールに特に有用」と説明し[^8]、公式 MCP サーバーの README では、ブロック JSON と比べて「AI エージェントにとって大幅にトークン効率が良い」ことを理由に挙げています[^9]。注目したいのは、Notion が保存形式そのものを置き換えたのではなく、**保存はブロック JSON のまま、読み手に合わせた読み取り手段を足した**という点です。**読み手が増えれば、同じデータに求められる形も増える**のです。
+象徴的なのが Notion です。もともとブロック単位の構造化 JSON を API で提供してきた Notion は、Markdown でページを読み書きする API を追加しました。公式ガイドはこれを「Markdown をネイティブに扱うエージェント系システムや開発者ツールに特に有用」と説明し[^6]、公式 MCP サーバーの README では、ブロック JSON と比べて「AI エージェントにとって大幅にトークン効率が良い」ことを理由に挙げています[^7]。注目したいのは、Notion が保存形式そのものを置き換えたのではなく、**保存はブロック JSON のまま、読み手に合わせた読み取り手段を足した**という点です。**読み手が増えれば、同じデータに求められる形も増える**のです。
 
 書き込み（データ保存）方向ではどうでしょうか。同じ「独自の構造化 JSON を受け取る書き込み API」でも、Notion と Atlassian では開発者の体験が対照的です。
 
-- **Notion**: スキーマに合わないリクエストはまるごと 400 で拒否し、何が合わないかをエラーメッセージで返します[^10]。利用者は送信した瞬間に、失敗したことと、その理由を知ることができます
-- **Atlassian（ADF）**: Jira や Confluence の本文形式である ADF は、公開仕様を持つ独自 JSON ですが[^11]、そのスキーマ定義はエディタ実装（ProseMirror ベース）と共有されています[^12]。不正な入力は拒否されるものの、所々問題の痕跡を確認できます
-  - 「Comment body is not valid!」といった一言エラーからはどこが悪いのか分からないという相談[^13]
-  - 公式の形式変換 API を求める Issue は、長年オープンのまま[^14]
-  - コミュニティ上で Markdown と ADF を変換する非公式ライブラリが乱立している様子[^15]
+- **Notion**: スキーマに合わないリクエストはまるごと 400 で拒否し、何が合わないかをエラーメッセージで返します[^8]。利用者は送信した瞬間に、失敗したこととその理由が分かります
+- **Atlassian（ADF）**: Jira や Confluence の本文形式である ADF は、仕様が公開された独自 JSON ですが、そのスキーマ定義はエディタ実装（ProseMirror ベース）と共有されています[^9]。不正な入力は拒否されるものの、苦労の痕跡があちこちに見つかります
+  - 「Comment body is not valid!」といった一言エラーからはどこが悪いのか分からないという相談[^10]
+  - 公式の形式変換 API を求める Issue は、長年オープンのまま[^11]
+  - コミュニティ上で Markdown と ADF を変換する非公式ライブラリが乱立している様子[^12]
 
-両者を分けているのは、拒否の有無ではありません。**外部の利用者のために設計された契約**と、**内部モデルがそのまま外に出た契約**とでは、エラーの分かりやすさから公式の道具だけで完結できるかどうかまで、開発者体験がここまで変わるのです。
+両者を分けているのは、拒否の有無ではありません。**外部の利用者のために設計された契約**と、**内部モデルがそのまま外に出た契約**とでは、エラーの分かりやすさから公式の道具だけで完結できるかどうかまで、開発者の体験はここまで変わります。
 
 ここから、2 つの教訓が得られます。
 
@@ -124,7 +124,7 @@ RTE のデータ保存フォーマットは、大きく分けて 3 種類あり�
 
 さて、お待ちかねの実験です。第 1 世代の RTE が生成していそうなレガシー風 HTML を用意し、第 2 世代の代表としてスキーマ型エディタの tiptap（ProseMirror ベース）に読み込ませ、**何も編集せずに**保存し直してみます。冒頭で紹介した round-trip というやつですね。
 
-使用するのはこちら。2010 年代の社内お知らせ感を想像して作った HTML です。
+用意したのはこちら。2010 年代の社内お知らせ感を想像して作った HTML です。
 
 ```html
 <div align="center"><font color="#cc0000" size="4"><b>【重要】サーバーメンテナンスのお知らせ</b></font></div>
@@ -173,7 +173,7 @@ console.log(html);
 なお、バージョンを `@2` に固定しているのは、v3 では StarterKit に含まれる拡張が変わり、実験結果も変わるためです。
 :::
 
-種明かしをすると、これはバグではなく**仕様**です。ProseMirror 系エディタは、スキーマに適合しないコンテンツを黙って捨てると公式に文書化されています[^16]。対極の設計として、CKEditor 5 には専用プラグインが無いマークアップも温存する公式機能（General HTML Support）があります[^17]。ただし、その公式ドキュメント自身が「すべての HTML 機能を有効にするとセキュリティリスクが生じる」として、危険な要素の除外リストの併用を促しています。なんでも温存する方式は、安全性や文書構造の綺麗さを犠牲にしやすいのです。
+種明かしをすると、これはバグではなく**仕様**です。ProseMirror 系エディタがスキーマに適合しないコンテンツを黙って捨てる挙動は、公式ドキュメントに明記されています[^13]。対極の設計として、CKEditor 5 には専用プラグインが無いマークアップも温存する公式機能（General HTML Support）があります[^14]。ただし、その公式ドキュメント自身が「すべての HTML 機能を有効にするとセキュリティリスクが生じる」として、危険な要素の除外リストの併用を促しています。なんでも温存する方式は、安全性や文書構造の綺麗さを犠牲にしやすくなります。
 
 つまり、**スキーマの厳格さと HTML の忠実さはトレードオフ**であり、どちらが正解かはエディタの良し悪しではなく、**自分たちのプロダクトに眠っている既存データが決める**のです。
 
@@ -184,37 +184,34 @@ console.log(html);
 というわけで、次に RTE を選ぶ機会があれば、このリストを思い出してみてください。全部は無理でも、**1 と 3 だけは選定前に**やってみる価値があると思います。
 
 1. **フォーマットから決める**——HTML / 構造化 JSON / Markdown を先に選び、エディタは「その実装」として選ぶ
-2. 編集面を分類する——既存コンテンツを開くか？出力は誰が消費するか？共同編集は？など
+2. エディタを使う画面ごとに要件を分ける——既存コンテンツを開くか？出力を誰が読むか？共同編集は？など
 3. **選定前に round-trip テスト**——実データ相当の文書を候補エディタで load → save → diff する
 4. ラッパーを作るなら、エディタ固有の型やイベントを外に漏らさない
 5. 外部 API の形式を、エディタの内部モデルと一体化させない
 6. 書き込み API は「厳格検証で拒否」か「欠落を明示した変換」の二択にする
 7. AI エージェントも読み手に数える——Markdown での読み取り手段の併設を検討する
-8. 旧エディタがある場合は、新エディタの導入の際に旧エディタの退役計画をセットで付ける
+8. 旧エディタがあるなら、新エディタの導入時に退役計画もセットにする
 9. サニタイズやメンションなどの横断的関心事は、特定のエディタに依存しない層に置く
 
 ## 終わり
 
 エディタは入れ替わります。データは残ります。**保存フォーマットは、実質無期限契約です。**
 
-次に RTE を選定する際には、機能比較表を開く前に、以下を問いかけてみてください。
+次に RTE を選定する際には、機能比較表を開く前に、こう問いかけてみてください。
 
 **「このコンテンツは何年生きて、その間にエディタは何回死に、読み書きする相手は誰に変わっているだろうか？」**
 
 [^1]: https://github.com/facebookarchive/draft-js
 [^2]: https://ckeditor.com/blog/ckeditor-4-end-of-life/
 [^3]: https://github.com/google/closure-library/issues/1214
-[^4]: https://slab.com/blog/announcing-quill-2-0/ （更新間隔は https://github.com/slab/quill/releases より。v1.3.7 が 2019 年 9 月、v2.0.0 が 2024 年 4 月）
-[^5]: https://ckeditor.com/blog/ContentEditable-The-Good-the-Bad-and-the-Ugly/#the-editing-task-force
-[^6]: https://bugzilla.mozilla.org/show_bug.cgi?id=1297414 （Firefox が `<br>` の生成をやめ、他ブラウザに挙動を揃えた際の議論。各ブラウザの当時の挙動も記録されています）
-[^7]: https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand
-[^8]: https://developers.notion.com/guides/data-apis/working-with-markdown-content
-[^9]: https://github.com/makenotion/notion-mcp-server#page-content-as-markdown
-[^10]: https://developers.notion.com/reference/status-codes#error-codes
-[^11]: https://developer.atlassian.com/cloud/jira/platform/apis/document/structure/
-[^12]: Atlassian のエディタは ProseMirror 上に構築されており（https://www.npmjs.com/package/@atlaskit/editor-core ）、公式パッケージ @atlaskit/adf-schema は、パッケージ説明文（package.json の description）を参考（https://www.npmjs.com/package/@atlaskit/adf-schema?activeTab=code）
-[^13]: https://community.atlassian.com/forums/Jira-questions/Jira-Cloud-REST-API-Unable-to-add-comment-via-ADF-receiving-quot/qaq-p/2808955
-[^14]: https://jira.atlassian.com/browse/JRACLOUD-77436
-[^15]: https://github.com/jamsinclair/marklassian や https://github.com/julianlam/adf-to-md など
-[^16]: https://tiptap.dev/docs/editor/core-concepts/schema
-[^17]: https://ckeditor.com/docs/ckeditor5/latest/features/html/general-html-support.html
+[^4]: https://ckeditor.com/blog/ContentEditable-The-Good-the-Bad-and-the-Ugly/#the-editing-task-force
+[^5]: https://bugzilla.mozilla.org/show_bug.cgi?id=1297414 （各ブラウザの当時の挙動が記録されています）
+[^6]: https://developers.notion.com/guides/data-apis/working-with-markdown-content
+[^7]: https://github.com/makenotion/notion-mcp-server#page-content-as-markdown
+[^8]: https://developers.notion.com/reference/status-codes#error-codes
+[^9]: https://www.npmjs.com/package/@atlaskit/adf-schema?activeTab=code
+[^10]: https://community.atlassian.com/forums/Jira-questions/Jira-Cloud-REST-API-Unable-to-add-comment-via-ADF-receiving-quot/qaq-p/2808955
+[^11]: https://jira.atlassian.com/browse/JRACLOUD-77436
+[^12]: https://github.com/jamsinclair/marklassian や https://github.com/julianlam/adf-to-md など
+[^13]: https://tiptap.dev/docs/editor/core-concepts/schema
+[^14]: https://ckeditor.com/docs/ckeditor5/latest/features/html/general-html-support.html
